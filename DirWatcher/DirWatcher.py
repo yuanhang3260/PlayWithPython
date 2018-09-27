@@ -1,4 +1,3 @@
-
 import datetime
 import sys
 import subprocess
@@ -12,6 +11,7 @@ from watchdog.events import FileSystemEventHandler
 class Watcher(object):
   def __init__(self, directory):
     self.dir_to_watch = directory
+    print "monitoring " + self.dir_to_watch
     self.observer = Observer()
 
   def run(self):
@@ -19,7 +19,7 @@ class Watcher(object):
     self.observer.start()
     try:
       while True:
-        continue
+        time.sleep(100)
     except:
       self.observer.stop()
       print "Error"
@@ -27,17 +27,19 @@ class Watcher(object):
     self.observer.join()
 
 
+command = ""
+
 class Handler(FileSystemEventHandler):
   @staticmethod
   def on_any_event(event):
     if event.is_directory:
       return
     elif event.event_type == 'modified':
-      cmd = "ls " + event.src_path
-      out = Command(cmd).run()
-      print "[" + str(datetime.datetime.now()) + "] " + cmd + ":"
-      for line in out:
-        print line
+      out = Command(command).run()
+      if out:
+        print "[" + str(datetime.datetime.now()) + "] " + command + ":"
+        for line in out:
+          print line
 
 
 class Command(object):
@@ -77,9 +79,12 @@ class Command(object):
 
 
 if __name__ == '__main__':
-  if len(sys.argv) != 2:
-    print "Usage: python DirWatcher.py [directory]"
+  if len(sys.argv) != 3:
+    print "Usage: python DirWatcher.py [directory] cmd"
     sys.exit(-1)
+
+  command = sys.argv[2]
 
   w = Watcher(sys.argv[1])
   w.run()
+
