@@ -11,7 +11,7 @@ class TopmoviesSpider(scrapy.Spider):
   def parse(self, response):
     # print response.text
 
-    movies = response.xpath('//*[@id="content"]//div[@class="article"]//ol[@class="grid_view"]/li');
+    movies = response.xpath('//*[@id="content"]//div[@class="article"]//ol[@class="grid_view"]/li')
     for movie in movies:
       movie_item = MovieItem()
       movie_item["name"] = movie.xpath('.//div[@class="hd"]/a/span[@class="title"]/text()').extract_first().strip()
@@ -20,6 +20,6 @@ class TopmoviesSpider(scrapy.Spider):
       yield movie_item
 
     # Go to next page.
-    next_link = response.xpath('//*[@id="content"]//div[@class="article"]//span[@class="next"]/link/@href').extract();
+    next_link = response.xpath('//*[@id="content"]//div[@class="article"]//span[@class="next"]/link/@href').extract()
     if next_link:
       yield scrapy.Request(TopmoviesSpider.start_urls[0] + next_link[0], callback=self.parse, dont_filter=True)
